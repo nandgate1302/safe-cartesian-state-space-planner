@@ -1,0 +1,14 @@
+[
+{
+  "directory": "C:/Users/91974/Documents/GitHub/safe-cartesian-state-space-planner/build",
+  "command": "C:\\TDM-GCC-64\\bin\\g++.exe -IC:/Users/91974/Documents/GitHub/safe-cartesian-state-space-planner/include -g -std=gnu++17 -o CMakeFiles\\safe_planner.dir\\src\\main.cpp.obj -c C:\\Users\\91974\\Documents\\GitHub\\safe-cartesian-state-space-planner\\src\\main.cpp",
+  "file": "C:/Users/91974/Documents/GitHub/safe-cartesian-state-space-planner/src/main.cpp",
+  "output": "C:/Users/91974/Documents/GitHub/safe-cartesian-state-space-planner/build/CMakeFiles/safe_planner.dir/src/main.cpp.obj"
+},
+{
+  "directory": "C:/Users/91974/Documents/GitHub/safe-cartesian-state-space-planner/build",
+  "command": "C:\\TDM-GCC-64\\bin\\g++.exe -IC:/Users/91974/Documents/GitHub/safe-cartesian-state-space-planner/include -g -std=gnu++17 -o CMakeFiles\\safe_planner.dir\\src\\LPAStarPlanner.cpp.obj -c C:\\Users\\91974\\Documents\\GitHub\\safe-cartesian-state-space-planner\\src\\LPAStarPlanner.cpp",
+  "file": "C:/Users/91974/Documents/GitHub/safe-cartesian-state-space-planner/src/LPAStarPlanner.cpp",
+  "output": "C:/Users/91974/Documents/GitHub/safe-cartesian-state-space-planner/build/CMakeFiles/safe_planner.dir/src/LPAStarPlanner.cpp.obj"
+}
+]
