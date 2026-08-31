@@ -1,51 +1,10 @@
-// General-purpose CLI: loads a PlanningProblem from a file (or stdin),
-// solves it, then drops into an interactive prompt where you can query
-// paths and trigger live updates (goal changes, edge changes) to see
-// LPA*'s incremental replanning in action.
-//
-// ---------------------------------------------------------------------
-// INPUT FILE FORMAT (blank lines and lines starting with '#' are ignored
-// anywhere - use them freely to comment your graph):
-//
-//   <numStates> <dimension>
-//   <id> <x1> <x2> ... <x_dimension>      (one line per state)
-//   ...
-//   <numBadStates>
-//   <id>                                    (one line per bad state)
-//   ...
-//   <numTransitions>
-//   <id> <from> <to> <cost> <safety> <reliability> [available]
-//   ...                                     (one line per transition;
-//                                             [available] is 0 or 1,
-//                                             defaults to 1 if omitted)
-//   <initialState> <goalState>
-//
-// See examples/sample_graph.txt for a working example.
-//
-// USAGE:
-//   safe_planner path/to/graph.txt     (load from a file)
-//   safe_planner                       (type/paste the graph directly, then
-//                                        keep typing commands on the same input)
-//
-// Once loaded, interactive commands:
-//   path [goalId]           print path to current goal, or to goalId
-//   goal <id>               change the goal (instant, no replanning)
-//   avail <transId> <0|1>   mark a transition unavailable/available
-//   cost <transId> <cost>   update a transition's cost
-//   add <id> <from> <to> <cost> <safety> <reliability> [avail]
-//                            add a new transition
-//   remove <transId>        remove (disable) a transition
-//   stats                    expansions triggered by the last update
-//   help                     show this list again
-//   quit                     exit
-// ---------------------------------------------------------------------
-
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <sstream>
 #include "LPAStarPlanner.h"
 #include "ProblemLoader.h"
+#include "MemoryUtil.h"
 
 static void printResult(const std::string& label, const PlanningResult& r) {
     std::cout << "[" << label << "] ";
@@ -63,6 +22,12 @@ static void printResult(const std::string& label, const PlanningResult& r) {
               << "\n";
 }
 
+static void printUpdateStats(const LPAStarPlanner& planner) {
+    std::cout << "  expansions: " << planner.lastReplanExpansions()
+              << " | time: " << std::fixed << std::setprecision(3)
+              << planner.lastPlanningTimeMs() << " ms\n";
+}
+
 static void printHelp() {
     std::cout <<
         "Commands:\n"
@@ -73,7 +38,9 @@ static void printHelp() {
         "  add <id> <from> <to> <cost> <safety> <reliability> [avail]\n"
         "                            - add a new transition\n"
         "  remove <transId>         - remove (disable) a transition\n"
-        "  stats                    - expansions triggered by the last update\n"
+        "  badstate <id>            - mark a state bad (excludes its transitions)\n"
+        "  goodstate <id>           - clear a state's bad-state status\n"
+        "  stats                    - expansions, timing, memory for the last update\n"
         "  help                     - show this list again\n"
         "  quit                     - exit\n";
 }
@@ -143,7 +110,7 @@ int main(int argc, char** argv) {
             if (iss >> id >> a) {
                 planner.setTransitionAvailable(id, a != 0);
                 printResult("replanned", planner.getPath(currentGoal));
-                std::cout << "  expansions: " << planner.lastReplanExpansions() << "\n";
+                printUpdateStats(planner);
             } else {
                 std::cout << "usage: avail <transitionId> <0|1>\n";
             }
@@ -152,7 +119,7 @@ int main(int argc, char** argv) {
             if (iss >> id >> c) {
                 planner.updateTransitionCost(id, c);
                 printResult("replanned", planner.getPath(currentGoal));
-                std::cout << "  expansions: " << planner.lastReplanExpansions() << "\n";
+                printUpdateStats(planner);
             } else {
                 std::cout << "usage: cost <transitionId> <newCost>\n";
             }
@@ -164,7 +131,7 @@ int main(int argc, char** argv) {
                 t.available = (avail != 0);
                 planner.addTransition(t);
                 printResult("replanned", planner.getPath(currentGoal));
-                std::cout << "  expansions: " << planner.lastReplanExpansions() << "\n";
+                printUpdateStats(planner);
             } else {
                 std::cout << "usage: add <id> <from> <to> <cost> <safety> <reliability> [avail]\n";
             }
@@ -173,12 +140,38 @@ int main(int argc, char** argv) {
             if (iss >> id) {
                 planner.removeTransition(id);
                 printResult("replanned", planner.getPath(currentGoal));
-                std::cout << "  expansions: " << planner.lastReplanExpansions() << "\n";
+                printUpdateStats(planner);
             } else {
                 std::cout << "usage: remove <transitionId>\n";
             }
+        } else if (cmd == "badstate") {
+            uint64_t id;
+            if (iss >> id) {
+                planner.addBadState(id);
+                printResult("replanned", planner.getPath(currentGoal));
+                printUpdateStats(planner);
+            } else {
+                std::cout << "usage: badstate <id>\n";
+            }
+        } else if (cmd == "goodstate") {
+            uint64_t id;
+            if (iss >> id) {
+                planner.removeBadState(id);
+                printResult("replanned", planner.getPath(currentGoal));
+                printUpdateStats(planner);
+            } else {
+                std::cout << "usage: goodstate <id>\n";
+            }
         } else if (cmd == "stats") {
-            std::cout << "Last update triggered " << planner.lastReplanExpansions() << " expansions.\n";
+            std::size_t rss = currentProcessRSSBytes();
+            std::cout << "Last update: " << planner.lastReplanExpansions() << " expansions, "
+                      << std::fixed << std::setprecision(3) << planner.lastPlanningTimeMs() << " ms\n";
+            std::cout << "Estimated planner memory: " << planner.approximateMemoryBytes() << " bytes\n";
+            if (rss > 0) {
+                std::cout << "Process RSS (OS-reported): " << rss / 1024 << " KB\n";
+            } else {
+                std::cout << "Process RSS: unavailable on this platform\n";
+            }
         } else {
             std::cout << "Unknown command. Type 'help' for a list.\n";
         }

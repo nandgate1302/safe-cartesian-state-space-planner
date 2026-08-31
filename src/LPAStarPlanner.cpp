@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <chrono>
 
 static constexpr double INF = std::numeric_limits<double>::infinity();
 
@@ -119,6 +120,7 @@ void LPAStarPlanner::updateVertex(uint64_t u) {
 }
 
 void LPAStarPlanner::computeShortestPath() {
+    auto startClock = std::chrono::steady_clock::now();
     lastExpansions_ = 0;
     while (!pq_.empty()) {
         QueueEntry top = pq_.top();
@@ -144,6 +146,8 @@ void LPAStarPlanner::computeShortestPath() {
                 for (auto tid : it->second) updateVertex(transitions_.at(tid).to);
         }
     }
+    auto endClock = std::chrono::steady_clock::now();
+    lastPlanningTimeMs_ = std::chrono::duration<double, std::milli>(endClock - startClock).count();
 }
 
 PlanningResult LPAStarPlanner::getPath(uint64_t goal) const {
@@ -230,4 +234,68 @@ void LPAStarPlanner::removeTransition(uint64_t transitionId) {
     it->second.available = false; // soft removal keeps adjacency bookkeeping simple
     updateVertex(to);
     computeShortestPath();
+}
+
+void LPAStarPlanner::removeAdjacencyEntry(std::unordered_map<uint64_t, std::vector<uint64_t>>& adj,
+                                           uint64_t key, uint64_t transitionId) {
+    auto it = adj.find(key);
+    if (it == adj.end()) return;
+    auto& vec = it->second;
+    vec.erase(std::remove(vec.begin(), vec.end(), transitionId), vec.end());
+}
+
+void LPAStarPlanner::addBadState(uint64_t id) {
+    if (!states_.count(id) || badStates_.count(id)) return; // unknown state, or already bad
+    badStates_.insert(id);
+
+    for (const auto& kv : transitions_) {
+        const Transition& t = kv.second;
+        if (t.from != id && t.to != id) continue;
+        removeAdjacencyEntry(outgoing_, t.from, t.id);
+        removeAdjacencyEntry(incoming_, t.to, t.id);
+    }
+    g_[id] = INF;
+    rhs_[id] = INF;
+
+    safetyDistCache_.clear();
+    for (const auto& kv : states_) updateVertex(kv.first);
+    computeShortestPath();
+}
+
+void LPAStarPlanner::removeBadState(uint64_t id) {
+    if (!badStates_.count(id)) return; // wasn't bad, nothing to do
+    badStates_.erase(id);
+
+    // Restore any transition touching this state, as long as its other
+    // endpoint isn't ALSO a bad state (in which case it must stay excluded).
+    for (const auto& kv : transitions_) {
+        const Transition& t = kv.second;
+        if (t.from != id && t.to != id) continue;
+        if (isBad(t.from) || isBad(t.to)) continue;
+        outgoing_[t.from].push_back(t.id);
+        incoming_[t.to].push_back(t.id);
+    }
+
+    safetyDistCache_.clear();
+    for (const auto& kv : states_) updateVertex(kv.first);
+    computeShortestPath();
+}
+
+std::size_t LPAStarPlanner::approximateMemoryBytes() const {
+    // Analytical estimate from container sizes - a portable stand-in for
+    // true OS-level RSS, which is platform-specific (see MemoryUtil.h for
+    // an actual OS measurement, used alongside this in main.cpp).
+    std::size_t bytes = 0;
+    bytes += states_.size() * (sizeof(uint64_t) + sizeof(State));
+    for (const auto& kv : states_) bytes += kv.second.embedding.size() * sizeof(double);
+    bytes += transitions_.size() * (sizeof(uint64_t) + sizeof(Transition));
+    bytes += badStates_.size() * sizeof(uint64_t);
+    for (const auto& kv : outgoing_) bytes += sizeof(uint64_t) + kv.second.size() * sizeof(uint64_t);
+    for (const auto& kv : incoming_) bytes += sizeof(uint64_t) + kv.second.size() * sizeof(uint64_t);
+    bytes += g_.size() * (sizeof(uint64_t) + sizeof(double));
+    bytes += rhs_.size() * (sizeof(uint64_t) + sizeof(double));
+    bytes += safetyDistCache_.size() * (sizeof(uint64_t) + sizeof(double));
+    bytes += pq_.size() * sizeof(QueueEntry);
+    bytes += queuedKey_.size() * (sizeof(uint64_t) + sizeof(Key));
+    return bytes;
 }

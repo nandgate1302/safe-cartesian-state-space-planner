@@ -7,20 +7,6 @@
 #include <utility>
 #include "Planner.h"
 
-// LPA* planner over a finite Cartesian state space.
-//
-// Design note (important for the report): instead of the textbook LPA*
-// early-termination-at-goal optimization, this implementation always runs
-// ComputeShortestPath() to full convergence, i.e. g(s) ends up holding the
-// true shortest distance from `start_` to every reachable state s, not just
-// the goal. This costs a little extra work up front, but buys two things
-// that matter for the assignment's dynamic-environment requirement:
-//   1. Goal changes (Test Case 5) become O(path length) - just re-extract
-//      the path via backpointers, zero replanning needed.
-//   2. Edge/availability changes (Test Cases 4 & 6) still only trigger the
-//      standard localized LPA* ripple, because the graph was already fully
-//      converged before the change - convergence itself doesn't make each
-//      individual update any less local.
 class LPAStarPlanner : public Planner {
 public:
     // Tunable weights mirroring the assignment's alpha/beta/gamma/delta
@@ -49,8 +35,13 @@ public:
     void addTransition(const Transition& t);
     void removeTransition(uint64_t transitionId);
 
+    void addBadState(uint64_t id);
+    void removeBadState(uint64_t id);
+
     // Diagnostics for the experiments section of the report.
     std::size_t lastReplanExpansions() const { return lastExpansions_; }
+    double lastPlanningTimeMs() const { return lastPlanningTimeMs_; }
+    std::size_t approximateMemoryBytes() const;
 
 private:
     using Key = std::pair<double, double>;
@@ -82,6 +73,10 @@ private:
     std::unordered_map<uint64_t, Key> queuedKey_; // node -> its currently-valid key (lazy deletion)
 
     mutable std::size_t lastExpansions_ = 0;
+    double lastPlanningTimeMs_ = 0.0; // wall-clock time of the most recent computeShortestPath() call
+
+    void removeAdjacencyEntry(std::unordered_map<uint64_t, std::vector<uint64_t>>& adj,
+                               uint64_t key, uint64_t transitionId);
 
     double g(uint64_t s) const;
     double rhsOf(uint64_t s) const;
