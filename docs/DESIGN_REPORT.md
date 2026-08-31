@@ -59,13 +59,13 @@ where $\alpha, \beta, \gamma, \delta \ge 0$ are weighting hyperparameters, and $
 
 To efficiently optimize this multi-objective criterion within graph search algorithms, we map the objectives into a scalarized positive edge weight function $w(u \to v)$ for every transition $t = (u, v)$:
 
-$$w(u \to v) = w_{\text{cost}} \cdot \left(\frac{\text{cost}(t)}{\max(\text{reliability}(t), \epsilon_R)}\right) + w_{\text{edge\_safety}} \cdot (1 - \text{safety}(t)) + w_{\text{dist\_safety}} \cdot \left(\frac{1}{\epsilon_D + \text{dist}(v, \mathcal{B})}\right)$$
+$$w(u \to v) = w_{\text{cost}} \cdot \left(\frac{\text{cost}(t)}{\max(\text{reliability}(t), \epsilon_R)}\right) + w_{\text{edge}} \cdot (1 - \text{safety}(t)) + w_{\text{dist}} \cdot \left(\frac{1}{\epsilon_D + \text{dist}(v, \mathcal{B})}\right)$$
 
 Where:
 - $\text{dist}(v, \mathcal{B}) = \min_{b \in \mathcal{B}} \|\mathbf{x}(v) - \mathbf{x}(b)\|_2$ is the Euclidean distance from state $v$ to the nearest bad state.
 - $\epsilon_R = 10^{-6}$ prevents numerical instability for near-zero reliability.
 - $\epsilon_D = 10^{-3}$ ensures finite barrier values when a state touches a bad state boundary.
-- $w_{\text{cost}}, w_{\text{edge\_safety}}, w_{\text{dist\_safety}}$ correspond directly to $\beta, \delta, \gamma$.
+- $w_{\text{cost}}, w_{\text{edge}}, w_{\text{dist}}$ correspond directly to $\beta, \delta, \gamma$.
 
 Minimizing $\sum w(u \to v)$ directly optimizes the multi-objective utility $\text{Score}(P)$.
 
@@ -194,7 +194,7 @@ At graph load time and during dynamic obstacle updates:
 
 ### 5.2 Layer 2: Soft Barrier Clearance Potential
 To satisfy Optimization Objective 4 ("Maximize minimum Euclidean distance to nearest bad state"), the edge scalarization incorporates an inverse-distance potential barrier:
-$$\text{Barrier}(v) = \frac{w_{\text{dist\_safety}}}{\epsilon_D + \min_{b \in \mathcal{B}} \|\mathbf{x}_v - \mathbf{x}_b\|_2}$$
+$$\text{Barrier}(v) = \frac{w_{\text{dist}}}{\epsilon_D + \min_{b \in \mathcal{B}} \|\mathbf{x}_v - \mathbf{x}_b\|_2}$$
 
 - States in close proximity to bad states incur high barrier penalties.
 - The planner naturally routes trajectories along wide, high-clearance corridors unless a tight passage is the sole reachable route.

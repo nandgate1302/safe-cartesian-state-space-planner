@@ -142,6 +142,19 @@ demo_test/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/demo_test.dir/build.make CMakeFiles/demo_test.dir/build
 .PHONY : demo_test/fast
 
+#=============================================================================
+# Target rules for targets named benchmark
+
+# Build rule for target.
+benchmark: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 benchmark
+.PHONY : benchmark
+
+# fast build rule for target.
+benchmark/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/benchmark.dir/build.make CMakeFiles/benchmark.dir/build
+.PHONY : benchmark/fast
+
 src/LPAStarPlanner.o: src/LPAStarPlanner.cpp.o
 .PHONY : src/LPAStarPlanner.o
 
@@ -149,6 +162,7 @@ src/LPAStarPlanner.o: src/LPAStarPlanner.cpp.o
 src/LPAStarPlanner.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/safe_planner.dir/build.make CMakeFiles/safe_planner.dir/src/LPAStarPlanner.cpp.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/demo_test.dir/build.make CMakeFiles/demo_test.dir/src/LPAStarPlanner.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/benchmark.dir/build.make CMakeFiles/benchmark.dir/src/LPAStarPlanner.cpp.o
 .PHONY : src/LPAStarPlanner.cpp.o
 
 src/LPAStarPlanner.i: src/LPAStarPlanner.cpp.i
@@ -158,6 +172,7 @@ src/LPAStarPlanner.i: src/LPAStarPlanner.cpp.i
 src/LPAStarPlanner.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/safe_planner.dir/build.make CMakeFiles/safe_planner.dir/src/LPAStarPlanner.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/demo_test.dir/build.make CMakeFiles/demo_test.dir/src/LPAStarPlanner.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/benchmark.dir/build.make CMakeFiles/benchmark.dir/src/LPAStarPlanner.cpp.i
 .PHONY : src/LPAStarPlanner.cpp.i
 
 src/LPAStarPlanner.s: src/LPAStarPlanner.cpp.s
@@ -167,6 +182,7 @@ src/LPAStarPlanner.s: src/LPAStarPlanner.cpp.s
 src/LPAStarPlanner.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/safe_planner.dir/build.make CMakeFiles/safe_planner.dir/src/LPAStarPlanner.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/demo_test.dir/build.make CMakeFiles/demo_test.dir/src/LPAStarPlanner.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/benchmark.dir/build.make CMakeFiles/benchmark.dir/src/LPAStarPlanner.cpp.s
 .PHONY : src/LPAStarPlanner.cpp.s
 
 src/ProblemLoader.o: src/ProblemLoader.cpp.o
@@ -192,6 +208,30 @@ src/ProblemLoader.s: src/ProblemLoader.cpp.s
 src/ProblemLoader.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/safe_planner.dir/build.make CMakeFiles/safe_planner.dir/src/ProblemLoader.cpp.s
 .PHONY : src/ProblemLoader.cpp.s
+
+src/benchmark.o: src/benchmark.cpp.o
+.PHONY : src/benchmark.o
+
+# target to build an object file
+src/benchmark.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/benchmark.dir/build.make CMakeFiles/benchmark.dir/src/benchmark.cpp.o
+.PHONY : src/benchmark.cpp.o
+
+src/benchmark.i: src/benchmark.cpp.i
+.PHONY : src/benchmark.i
+
+# target to preprocess a source file
+src/benchmark.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/benchmark.dir/build.make CMakeFiles/benchmark.dir/src/benchmark.cpp.i
+.PHONY : src/benchmark.cpp.i
+
+src/benchmark.s: src/benchmark.cpp.s
+.PHONY : src/benchmark.s
+
+# target to generate assembly for a file
+src/benchmark.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/benchmark.dir/build.make CMakeFiles/benchmark.dir/src/benchmark.cpp.s
+.PHONY : src/benchmark.cpp.s
 
 src/demo_test.o: src/demo_test.cpp.o
 .PHONY : src/demo_test.o
@@ -249,6 +289,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... benchmark"
 	@echo "... demo_test"
 	@echo "... safe_planner"
 	@echo "... src/LPAStarPlanner.o"
@@ -257,6 +298,9 @@ help:
 	@echo "... src/ProblemLoader.o"
 	@echo "... src/ProblemLoader.i"
 	@echo "... src/ProblemLoader.s"
+	@echo "... src/benchmark.o"
+	@echo "... src/benchmark.i"
+	@echo "... src/benchmark.s"
 	@echo "... src/demo_test.o"
 	@echo "... src/demo_test.i"
 	@echo "... src/demo_test.s"

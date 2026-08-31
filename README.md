@@ -130,10 +130,12 @@ Runs comprehensive benchmarks on canonical test cases, scaling grid topologies (
 
 ### Operational Objective Function
 The assignment specifies the multi-objective utility:
+
 $$\text{Score}(P) = \alpha G - \beta C + \gamma D + \delta R$$
 
 This is operationalized into a scalarized edge cost minimized by LPA*:
-$$w(u \to v) = w_{\text{cost}} \cdot \left(\frac{\text{cost}(t)}{\max(\text{reliability}(t), \epsilon_R)}\right) + w_{\text{edge\_safety}} \cdot (1 - \text{safety}(t)) + w_{\text{dist\_safety}} \cdot \left(\frac{1}{\epsilon_D + \text{dist}(v, \mathcal{B})}\right)$$
+
+$$w(u \to v) = w_{\text{cost}} \cdot \left(\frac{\text{cost}(t)}{\max(\text{reliability}(t), \epsilon_R)}\right) + w_{\text{edge}} \cdot (1 - \text{safety}(t)) + w_{\text{dist}} \cdot \left(\frac{1}{\epsilon_D + \text{dist}(v, \mathcal{B})}\right)$$
 
 ### Dual-Layer Safety Guarantee
 1. **Hard Topological Exclusion:** States in $\mathcal{B}$ and their incident transitions are strictly omitted from the searchable graph, ensuring that the number of bad states visited is identically **zero**.

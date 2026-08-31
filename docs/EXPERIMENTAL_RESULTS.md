@@ -153,7 +153,7 @@ To quantify the computational advantage of LPA*'s incremental replanning, we sub
 
 ## 5. Benchmark 4: Safety Margin Sensitivity ($\gamma$ Parameter Sweep)
 
-Using the canonical Test Case 3 topology, we swept the obstacle distance safety weight $\gamma = w_{\text{dist\_safety}}$ from $0.0$ to $10.0$ to observe trajectory selection and clearance behavior.
+Using the canonical Test Case 3 topology, we swept the obstacle distance safety weight $\gamma = w_{\text{dist}}$ from $0.0$ to $10.0$ to observe trajectory selection and clearance behavior.
 
 ```
        Trajectory Selection under Parameter Sweep

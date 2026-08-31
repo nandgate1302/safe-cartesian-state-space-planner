@@ -183,4 +183,6 @@ CMakeFiles/safe_planner.dir/src/main.cpp.o: \
  /home/nandgate_here/Documents/Documents/GitHub/safe-cartesian-state-space-planner/include/State.h \
  /home/nandgate_here/Documents/Documents/GitHub/safe-cartesian-state-space-planner/include/Transition.h \
  /home/nandgate_here/Documents/Documents/GitHub/safe-cartesian-state-space-planner/include/PlanningResult.h \
- /home/nandgate_here/Documents/Documents/GitHub/safe-cartesian-state-space-planner/include/ProblemLoader.h
+ /home/nandgate_here/Documents/Documents/GitHub/safe-cartesian-state-space-planner/include/ProblemLoader.h \
+ /home/nandgate_here/Documents/Documents/GitHub/safe-cartesian-state-space-planner/include/MemoryUtil.h \
+ /usr/include/c++/11/cstddef

@@ -1,4 +1,5 @@
 /home/nandgate_here/Documents/Documents/GitHub/safe-cartesian-state-space-planner/build/CMakeFiles/safe_planner.dir
 /home/nandgate_here/Documents/Documents/GitHub/safe-cartesian-state-space-planner/build/CMakeFiles/demo_test.dir
+/home/nandgate_here/Documents/Documents/GitHub/safe-cartesian-state-space-planner/build/CMakeFiles/benchmark.dir
 /home/nandgate_here/Documents/Documents/GitHub/safe-cartesian-state-space-planner/build/CMakeFiles/edit_cache.dir
 /home/nandgate_here/Documents/Documents/GitHub/safe-cartesian-state-space-planner/build/CMakeFiles/rebuild_cache.dir
